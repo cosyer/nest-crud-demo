@@ -7,6 +7,7 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
+import { ApiTags, ApiOperation } from "@nestjs/swagger";
 import { CreateUserDTO, EditUserDTO } from './user.dto';
 import { User } from './user.interface';
 import { UserService } from './user.service';
@@ -18,11 +19,16 @@ interface UserResponse<T = unknown> {
 }
 
 @Controller('user')
+@ApiTags("用户接口")
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   // GET /user/users
   @Get('users')
+  @ApiOperation({
+    description: "获取用户列表",
+    summary: "获取用户列表",
+  })
   async findAll(): Promise<UserResponse<User[]>> {
     return {
       code: 200,
