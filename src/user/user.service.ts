@@ -10,12 +10,14 @@ export class UserService {
 
   // 查找所有用户
   async findAll(): Promise<User[]> {
-    const users = await this.userModel.find();
+    const users = await this.userModel.find().exec();
+    console.log(1111, users)
     return users;
   }
 
   // 查找单个用户
   async findOne(_id: string): Promise<User> {
+    console.log(2222, _id)
     return await this.userModel.findById(_id);
   }
 

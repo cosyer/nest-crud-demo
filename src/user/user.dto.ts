@@ -3,7 +3,6 @@ import { ApiProperty } from "@nestjs/swagger";
 
 
 export class CreateUserDTO {
-  readonly _id: string;
   @ApiProperty({
     example: "c",
     description: "用户名",

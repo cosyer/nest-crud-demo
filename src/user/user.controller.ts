@@ -7,7 +7,7 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation } from "@nestjs/swagger";
+import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { CreateUserDTO, EditUserDTO } from './user.dto';
 import { User } from './user.interface';
 import { UserService } from './user.service';
@@ -18,16 +18,16 @@ interface UserResponse<T = unknown> {
   message: string;
 }
 
-@Controller('user')
-@ApiTags("用户接口")
+@Controller('users')
+@ApiTags('用户接口')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  // GET /user/users
-  @Get('users')
+  // GET /users
+  @Get()
   @ApiOperation({
-    description: "获取用户列表",
-    summary: "获取用户列表",
+    description: '获取用户列表',
+    summary: '获取用户列表',
   })
   async findAll(): Promise<UserResponse<User[]>> {
     return {
@@ -37,7 +37,7 @@ export class UserController {
     };
   }
 
-  // GET /user/:_id
+  // GET /users/:_id
   @Get(':_id')
   async findOne(@Param('_id') _id: string): Promise<UserResponse<User>> {
     return {
@@ -47,7 +47,7 @@ export class UserController {
     };
   }
 
-  // POST /user
+  // POST /users
   @Post()
   async addOne(@Body() body: CreateUserDTO): Promise<UserResponse> {
     await this.userService.addOne(body);
@@ -57,7 +57,7 @@ export class UserController {
     };
   }
 
-  // PUT /user/:_id
+  // PUT /users/:_id
   @Put(':_id')
   async editOne(
     @Param('_id') _id: string,
@@ -70,7 +70,7 @@ export class UserController {
     };
   }
 
-  // DELETE /user/:_id
+  // DELETE /users/:_id
   @Delete(':_id')
   async deleteOne(@Param('_id') _id: string): Promise<UserResponse> {
     await this.userService.deleteOne(_id);
