@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import {
   Body,
   Controller,
@@ -6,11 +7,19 @@ import {
   Param,
   Post,
   Put,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+// const bcryptjs = require('bcryptjs');
+import bcryptjs from 'bcryptjs';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
-import { CreateUserDTO, EditUserDTO } from './user.dto';
+import { CreateUserDTO, EditUserDTO, LoginDTO } from './user.dto';
 import { User } from './user.interface';
 import { UserService } from './user.service';
+import { AuthGuard } from '@nestjs/passport';
+import { JwtService } from '@nestjs/jwt';
+import { NoAuth } from 'src/decorator/no-auth';
 
 interface UserResponse<T = unknown> {
   code: number;
@@ -18,10 +27,16 @@ interface UserResponse<T = unknown> {
   message: string;
 }
 
+// 盐值
+const SALT = 10;
+
 @Controller('users')
 @ApiTags('用户接口')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly jwtService: JwtService,
+  ) {}
 
   // GET /users
   @Get()
@@ -29,6 +44,7 @@ export class UserController {
     description: '获取用户列表',
     summary: '获取用户列表',
   })
+  // @UseGuards(AuthGuard('jwt'))
   async findAll(): Promise<UserResponse<User[]>> {
     return {
       code: 200,
@@ -50,7 +66,11 @@ export class UserController {
   // POST /users
   @Post()
   async addOne(@Body() body: CreateUserDTO): Promise<UserResponse> {
-    await this.userService.addOne(body);
+    // 加密
+    await this.userService.addOne({
+      ...body,
+      password: bcryptjs.hashSync(body.password, SALT),
+    });
     return {
       code: 200,
       message: 'success',
@@ -77,6 +97,22 @@ export class UserController {
     return {
       code: 200,
       message: 'success',
+    };
+  }
+
+  // POST /users/login
+  // @UseGuards(AuthGuard('local'))
+  @NoAuth()
+  @Post('login')
+  async login(@Body() user: LoginDTO, @Req() req) {
+    return req.user;
+  }
+
+  @Post('login2')
+  @NoAuth()
+  async login2(@Body() user: LoginDTO) {
+    return {
+      token: this.jwtService.sign(user),
     };
   }
 }
