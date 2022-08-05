@@ -13,6 +13,7 @@ import {
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 // const bcryptjs = require('bcryptjs');
 import bcryptjs from 'bcryptjs';
+import { RateLimit } from 'nestjs-rate-limiter';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { CreateUserDTO, EditUserDTO, LoginDTO } from './user.dto';
 import { User } from './user.interface';
@@ -104,6 +105,12 @@ export class UserController {
   // @UseGuards(AuthGuard('local'))
   @NoAuth()
   @Post('login')
+  @RateLimit({
+    keyPrefix: 'login',
+    points: 1,
+    duration: 1,
+    errorMessage: '请求太快了，请稍后重试',
+  })
   async login(@Body() user: LoginDTO, @Req() req) {
     return req.user;
   }
