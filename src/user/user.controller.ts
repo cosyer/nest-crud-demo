@@ -11,8 +11,8 @@ import {
   UseGuards,
 } from '@nestjs/common';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-// const bcryptjs = require('bcryptjs');
-import bcryptjs from 'bcryptjs';
+const bcryptjs = require('bcryptjs');
+// import bcryptjs from 'bcryptjs';
 import { RateLimit } from 'nestjs-rate-limiter';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { CreateUserDTO, EditUserDTO, LoginDTO } from './user.dto';
@@ -41,11 +41,12 @@ export class UserController {
 
   // GET /users
   @Get()
+  // @NoAuth()
+  @UseGuards(AuthGuard('local'))
   @ApiOperation({
     description: '获取用户列表',
     summary: '获取用户列表',
   })
-  // @UseGuards(AuthGuard('jwt'))
   async findAll(): Promise<UserResponse<User[]>> {
     return {
       code: 200,
@@ -102,7 +103,6 @@ export class UserController {
   }
 
   // POST /users/login
-  // @UseGuards(AuthGuard('local'))
   @NoAuth()
   @Post('login')
   @RateLimit({
